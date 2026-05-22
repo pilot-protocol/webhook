@@ -1,5 +1,9 @@
 # webhook
 
+[![ci](https://github.com/pilot-protocol/webhook/actions/workflows/ci.yml/badge.svg)](https://github.com/pilot-protocol/webhook/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/pilot-protocol/webhook/branch/main/graph/badge.svg)](https://codecov.io/gh/pilot-protocol/webhook)
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+
 Webhook plugin for the Pilot Protocol daemon. POSTs daemon events
 (node-discovered, connection-accepted, message-received, etc.) to an
 HTTP(S) endpoint the operator configures. Subscribes to the in-process
@@ -37,3 +41,7 @@ rt.Register(webhookSvc)
 | Tag | Effect |
 |---|---|
 | `no_webhook` | Compiles a stub that no-ops `Start/Stop/SetURL`. |
+
+## License
+
+AGPL-3.0-or-later. See [LICENSE](LICENSE).
