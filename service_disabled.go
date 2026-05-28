@@ -13,7 +13,7 @@ package webhook
 import (
 	"context"
 
-	"github.com/TeoSlayer/pilotprotocol/pkg/coreapi"
+	"github.com/pilot-protocol/common/coreapi"
 )
 
 // Stats mirrors the real Stats so cmd/daemon's webhookManagerAdapter
