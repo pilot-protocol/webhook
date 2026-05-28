@@ -128,10 +128,9 @@ func (s *Service) startClientLocked(url string) {
 		}
 		return s.deps.Identity.NodeID()
 	}
+	// NewClient returns nil only when url == "", which is already
+	// short-circuited above; no defensive nil check needed here.
 	s.client = NewClient(url, nodeID, s.opts...)
-	if s.client == nil {
-		return
-	}
 	ch, cancel := s.deps.Events.Subscribe("*")
 	s.cancel = cancel
 	done := make(chan struct{})
