@@ -15,6 +15,9 @@ package webhook
 
 import (
 	"bytes"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"log/slog"
 	"net/http"
@@ -110,6 +113,7 @@ type Client struct {
 	nextID         atomic.Uint64
 	dropped        atomic.Uint64
 	initialBackoff time.Duration // retry backoff (default 1s)
+	secret         string        // HMAC-SHA256 pre-shared secret (empty = no sig)
 
 	// Circuit breaker state. After CircuitOpenThreshold (5)
 	// consecutive total failures (each event = up to MaxRetries
@@ -136,6 +140,15 @@ func WithHTTPTimeout(d time.Duration) Option {
 // WithRetryBackoff sets the initial retry backoff (default 1s, doubles each retry).
 func WithRetryBackoff(d time.Duration) Option {
 	return func(wc *Client) { wc.initialBackoff = d }
+}
+
+// WithSecret sets the HMAC-SHA256 pre-shared secret. When non-empty, every
+// outbound POST includes an X-Pilot-Signature-256 header with the hex-encoded
+// HMAC-SHA256 of the request body. Receivers can verify authenticity and
+// integrity by recomputing the HMAC — the header is simply ignored if the
+// receiver does not care (backward-compatible).
+func WithSecret(secret string) Option {
+	return func(wc *Client) { wc.secret = secret }
 }
 
 // NewClient creates a webhook dispatcher. If url is empty, returns nil.
@@ -260,6 +273,15 @@ func (wc *Client) post(ev *Event) {
 		return
 	}
 
+	// HMAC-SHA256 signature header (PILOT-90): if a secret is configured,
+	// sign the body so the receiver can verify authenticity+integrity.
+	var sigHeader string
+	if wc.secret != "" {
+		mac := hmac.New(sha256.New, []byte(wc.secret))
+		mac.Write(body)
+		sigHeader = hex.EncodeToString(mac.Sum(nil))
+	}
+
 	// Circuit breaker (v1.9.1): if the breaker is open AND we're still
 	// inside the cooldown window, short-circuit. The first event after
 	// cooldown elapses is the probe — if it succeeds, breaker resets
@@ -284,7 +306,16 @@ func (wc *Client) post(ev *Event) {
 			backoff *= 2
 		}
 
-		resp, err := wc.client.Post(wc.url, "application/json", bytes.NewReader(body))
+		req, err := http.NewRequest(http.MethodPost, wc.url, bytes.NewReader(body))
+		if err != nil {
+			slog.Warn("webhook POST request build failed", "event", ev.Event, "error", err)
+			continue
+		}
+		req.Header.Set("Content-Type", "application/json")
+		if sigHeader != "" {
+			req.Header.Set("X-Pilot-Signature-256", sigHeader)
+		}
+		resp, err := wc.client.Do(req)
 		if err != nil {
 			slog.Warn("webhook POST failed", "event", ev.Event, "attempt", attempt+1, "error", err)
 			continue // network error → retry
