@@ -3,6 +3,9 @@
 package webhook_test
 
 import (
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -328,5 +331,61 @@ func TestPendingHandshakeStruct(t *testing.T) {
 	}
 	if ph.NodeID != 99 || ph.Justification != "testing" {
 		t.Fatal("PendingHandshake field mismatch")
+	}
+}
+
+// ---------------------------------------------------------------------------
+// HMAC signature — PILOT-90
+// ---------------------------------------------------------------------------
+
+func TestWebhookClientHMACSignatureHeader(t *testing.T) {
+	t.Parallel()
+	secret := "test-secret-key"
+	var sigHeader string
+	var body []byte
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		sigHeader = r.Header.Get("X-Pilot-Signature-256")
+		body, _ = io.ReadAll(r.Body)
+		w.WriteHeader(200)
+	}))
+	defer ts.Close()
+
+	wc := webhook.NewClient(ts.URL, func() uint32 { return 42 },
+		webhook.WithSecret(secret))
+	if wc == nil {
+		t.Fatal("expected non-nil client with secret")
+	}
+	wc.Emit("test.event", map[string]string{"key": "val"})
+	wc.Close()
+
+	if sigHeader == "" {
+		t.Fatal("X-Pilot-Signature-256 header not set when secret is configured")
+	}
+	// Verify the HMAC ourselves
+	mac := hmac.New(sha256.New, []byte(secret))
+	mac.Write(body)
+	expected := hex.EncodeToString(mac.Sum(nil))
+	if sigHeader != expected {
+		t.Fatalf("HMAC mismatch: got %s, want %s", sigHeader, expected)
+	}
+}
+
+func TestWebhookClientNoSignatureWhenNoSecret(t *testing.T) {
+	t.Parallel()
+	var sigHeader string
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		sigHeader = r.Header.Get("X-Pilot-Signature-256")
+		w.WriteHeader(200)
+	}))
+	defer ts.Close()
+
+	wc := webhook.NewClient(ts.URL, func() uint32 { return 42 })
+	wc.Emit("test.event", nil)
+	wc.Close()
+
+	if sigHeader != "" {
+		t.Fatal("X-Pilot-Signature-256 should NOT be set when no secret configured")
 	}
 }
