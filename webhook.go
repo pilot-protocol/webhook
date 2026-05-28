@@ -28,7 +28,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/TeoSlayer/pilotprotocol/pkg/urlvalidate"
+	"github.com/pilot-protocol/common/urlvalidate"
 )
 
 // urlPath is the file where the last-set webhook URL is persisted so
