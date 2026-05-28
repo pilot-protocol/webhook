@@ -6,7 +6,7 @@ require github.com/pilot-protocol/handshake v0.1.0
 
 require (
 	github.com/TeoSlayer/pilotprotocol v0.0.0 // indirect
-	github.com/pilot-protocol/common v0.1.0
+	github.com/pilot-protocol/common v0.2.0
 )
 
 replace github.com/TeoSlayer/pilotprotocol => ../web4
