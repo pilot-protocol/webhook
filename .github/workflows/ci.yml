@@ -24,11 +24,21 @@ jobs:
           repository: TeoSlayer/pilotprotocol
           path: web4
 
+      - name: Checkout common
+        uses: actions/checkout@v4
+        with:
+          repository: pilot-protocol/common
+          path: common
+
       - uses: actions/setup-go@v5
         with:
           go-version: '1.25'
           cache: true
           cache-dependency-path: webhook/go.sum
+
+      - name: Tidy (webhook) go.mod (absorb sibling drift)
+        working-directory: webhook
+        run: go mod tidy
 
       - name: Run tests with coverage
         working-directory: webhook
