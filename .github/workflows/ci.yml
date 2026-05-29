@@ -36,6 +36,10 @@ jobs:
           cache: true
           cache-dependency-path: webhook/go.sum
 
+      - name: Tidy (webhook) go.mod (absorb sibling drift)
+        working-directory: webhook
+        run: go mod tidy
+
       - name: Run tests with coverage
         working-directory: webhook
         run: go test -race -coverprofile=coverage.out -covermode=atomic ./...
