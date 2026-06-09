@@ -38,7 +38,12 @@ jobs:
 
       - name: Tidy (webhook) go.mod (absorb sibling drift)
         working-directory: webhook
-        run: go mod tidy
+        # -e tolerates transitive *test* imports we don't control —
+        # e.g. when `handshake`'s tests import packages that were
+        # moved out of `pilotprotocol` into `common`. webhook's own
+        # build + tests below are the real gate; tidy is just to
+        # absorb declared-direct-dep drift.
+        run: go mod tidy -e
 
       - name: Run tests with coverage
         working-directory: webhook
