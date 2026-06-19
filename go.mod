@@ -12,6 +12,6 @@ require (
 
 require github.com/pilot-protocol/common v0.4.8
 
-replace github.com/TeoSlayer/pilotprotocol => ../web4
+replace github.com/pilot-protocol/pilotprotocol => ../web4
 
 replace github.com/pilot-protocol/common => ../common
