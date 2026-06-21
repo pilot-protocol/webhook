@@ -1,10 +1,2 @@
-github.com/coder/websocket v1.8.14 h1:9L0p0iKiNOibykf283eHkKUHHrpG7f65OE3BhhO7v9g=
-github.com/coder/websocket v1.8.14/go.mod h1:NX3SzP+inril6yawo5CQXx8+fk145lPDC6pumgx0mVg=
 github.com/pilot-protocol/handshake v0.2.1 h1:ZPRLKPV5Heigzj4HNkwb/JOiabdVPg3XzH4LocCCCZo=
 github.com/pilot-protocol/handshake v0.2.1/go.mod h1:g88rTfLUY9sxj9j41IqjpuEBZ5Rwe4xsOjh8JmTeGT8=
-github.com/pilot-protocol/rendezvous v0.2.4 h1:nxYm12RzEUA6zzNGcnDqxNcGBSIALL5uRH9zX+Q0CSg=
-github.com/pilot-protocol/rendezvous v0.2.4/go.mod h1:w7SC0nZCmWPyc7hxdFZ200zQVA75UoaC25MznUQXNFE=
-github.com/pilot-protocol/trustedagents v0.2.3 h1:QQJHYqzPrECJwkCev0xIDBMjd92uhtcxcCMc2aOrRHc=
-github.com/pilot-protocol/trustedagents v0.2.3/go.mod h1:gDgEOC9lHmXSS9v45h80XxlmUS861soIrA0AsbXiSV4=
-golang.org/x/sys v0.45.0 h1:dO4czNzziLiiXplLQgBCEpCvXQ3dnkn0SdaZSYdQ+FY=
-golang.org/x/sys v0.45.0/go.mod h1:4GL1E5IUh+htKOUEOaiffhrAeqysfVGipDYzABqnCmw=
