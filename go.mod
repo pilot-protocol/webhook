@@ -4,6 +4,6 @@ go 1.25.12
 
 require github.com/pilot-protocol/handshake v0.2.2
 
-require github.com/pilot-protocol/common v0.5.7
+require github.com/pilot-protocol/common v0.5.9
 
 require github.com/pilot-protocol/trustedagents v0.2.5 // indirect
